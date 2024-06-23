@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import './styles.css';
+import { InputTodo } from './components/InputTodo';
+import { IncompleteTodos } from './components/IncompleteTodos';
+import { CompleteTodos } from './components/CompleteTodos';
+
 
 export const Todo =() => {
      {/*追加ボタンを押したら未完了のTODOに移動するための状態管理*/}
@@ -45,49 +49,30 @@ export const Todo =() => {
             setcompleteTodos(newCompleteTodos);
             setIncompleteTodos(newInColmpleteTodos);
         }
+
+        const isMaxLimitIncompleteTodos = incompleteTodos.length >= 5;
         return(
                 <>
-                <div className="input-area">
-                        <input placeholder="TODOを入力" value={todoText} onChange={onChangeTodoText}/> 
-                        <button onClick={onClickAdd}>追加</button>
-                </div> 
-                <div className="incomplete-area">
-                        <p className="title">未完了のTODO</p> 
-                <ul>
-                {/* mapの引数にはループさせたい要素を入れる。li要素をループしてレンダリングさせたい*/}
-                {/* ループするときにはループさせたい一位の要素に対してキーを設定する必要がある。何個目の要素かを実際のDOMに反映するときに把握するため*/}
-                {/* 単一式の書き方の考え方を活かして（）でくくるとreturnとアロー関数の{}を省略してすっきりと書くことができる。*/}
-           
-                    {/*リストの何番目かを判断するためにmapの第2引数としてindexを持たせる。*/}
-                    {incompleteTodos.map((todo, index) =>
-                       (
-                                <li key={todo}>
-                                <div className="list-row">
-                                    <p className="todo-item">{todo}</p> 
-                                    <button onClick={() => onClickComplete(index)}>完了</button>  
-                                     {/*削除ボタンを押したときに関数を実行するが新しく関数を作成して作成した関数の中身で関数を実行してその引数としてindexを持たせる。←この書き方をしないと関数を読み取った時点でループしてしまうから。*/}
-                                    <button onClick={() => onClickDelete(index)}>削除</button>  
-                                </div>
-                              </li>
-                        )
-                    )}   
-                </ul>
-                </div>
-                <div className="complete-area">
-                    <p className="title">完了のTODO</p> 
-                <ul>
-                {completeTodos.map((todo, index) =>
-                       (
-                                <li key={todo}>
-                                <div className="list-row">
-                                    <p className="todo-item">{todo}</p> 
-                                    <button onClick={() => onClickBack(index)}>戻す</button>  
-                                </div>
-                              </li>
-                        )
-                    )}   
-                </ul>
-                </div>
+                <InputTodo 
+                todoText={todoText} 
+                onChange={onChangeTodoText} 
+                onClick={onClickAdd}
+                disabled={isMaxLimitIncompleteTodos}
+                />
+                {isMaxLimitIncompleteTodos && (
+                    <p style={{color:"red"}}>
+                    登録できるTODOは5個までだよ～。消化しろ～。
+                    </p>
+                )}
+                <IncompleteTodos 
+                todos={incompleteTodos} 
+                onClickComplete={onClickComplete} 
+                onClickDelete={onClickDelete}
+                />
+                <CompleteTodos
+                todos={completeTodos}
+                onClickBack={onClickBack}
+                />
                 </>
         );
 };
